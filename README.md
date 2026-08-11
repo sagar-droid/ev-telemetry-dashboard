@@ -280,3 +280,70 @@ carry several distinct event types.
   its telemetry/alerts/ride history automatically.
 
 ---
+{
+    "services": {
+        "frontend": {
+            "root": "frontend",
+            "framework": "nextjs"
+        },
+        "backend": {
+            "root": "backend"
+        }
+    },
+    "rewrites": [
+        {
+            "source": "/api/backend(/.*)?",
+            "destination": {
+                "type": "service",
+                "service": "backend"
+            }
+        },
+        {
+            "source": "/(.*)",
+            "destination": {
+                "type": "service",
+                "service": "frontend"
+            }
+        }
+    ]
+}
+
+## 7. CI/CD and Vercel deployment
+
+### GitHub Actions
+
+The workflow at `.github/workflows/ci.yml` runs for pull requests and pushes
+to `main`. It installs both projects from their lockfiles, checks backend
+JavaScript syntax, and builds the Next.js frontend with CI-safe placeholder
+URLs. A pull request should pass this workflow before it is merged.
+
+### Deploy the frontend with Vercel
+
+1. In Vercel, create a new project and import this GitHub repository.
+2. Set the project **Root Directory** to `frontend`.
+3. Keep the framework preset as **Next.js**.
+4. Add these environment variables in Vercel for Preview and Production:
+
+  ```text
+  NEXT_PUBLIC_API_URL=https://your-backend.example.com
+  NEXT_PUBLIC_WS_URL=wss://your-backend.example.com
+  ```
+
+5. Deploy. Vercel will create preview deployments for branches and deploy
+  production when changes are merged into the configured production branch.
+
+The frontend environment variables must point to the public backend URL. The
+WebSocket URL must use `wss://` in production. Do not commit `.env.local` or
+production secrets.
+
+### Deploy the backend separately
+
+The backend is a persistent Express server with WebSocket and Server-Sent
+Events connections, Redis state, MySQL, and an optional telemetry simulator.
+It should run on a Node host that supports long-lived processes, such as
+Render, Railway, Fly.io, or a VM, rather than as a Vercel function.
+
+Configure the backend environment from `backend/.env.example`, then set
+`CLIENT_ORIGIN` to the deployed Vercel URL. After the backend is deployed,
+copy its HTTPS URL into `NEXT_PUBLIC_API_URL` and its secure WebSocket URL
+into `NEXT_PUBLIC_WS_URL` in Vercel, then redeploy the frontend.
