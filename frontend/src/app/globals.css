@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  --sidebar-width: 16rem;
+}
+
+body {
+  background-color: #0b0f0c;
+  color: #e8f0ea;
+  overflow: hidden;
+}
+
+.app-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: var(--sidebar-width);
+  border-right: 1px solid #1f2a22;
+  background-color: #0e130f;
+  transition: width 180ms ease;
+}
+
+.sidebar-toggle {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.dashboard-main {
+  height: 100vh;
+  width: calc(100% - var(--sidebar-width));
+  max-width: 72rem;
+  margin-left: var(--sidebar-width);
+  margin-right: auto;
+  overflow-y: auto;
+  transition: margin-left 180ms ease;
+}
+
+.card {
+  background-color: #121814;
+  border: 1px solid #1f2a22;
+  border-radius: 0.75rem;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.leaflet-container {
+  background: #101610;
+  z-index: 0;
+}
+
+@media (max-width: 1023px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-sidebar {
+    inset: 0 0 auto;
+    width: 100%;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid #1f2a22;
+  }
+
+  .app-sidebar.is-collapsed {
+    height: 4.5rem;
+    overflow: hidden;
+  }
+
+  .dashboard-main {
+    height: auto;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding-top: 4.5rem;
+    overflow: visible;
+  }
+}
